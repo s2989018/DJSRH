@@ -26,17 +26,17 @@ if DATASET == 'WIKI':
 
 if DATASET == 'MIRFlickr':
 
-    LABEL_DIR = 'path/to/mirflickr/mirflickr25k-lall.mat'
-    TXT_DIR = 'path/to/mirflickr/mirflickr25k-yall.mat'
-    IMG_DIR = 'path/to/mirflickr/mirflickr25k-iall.mat'
+    LABEL_DIR = './datasets/MIRFlickr_djsrh/mirflickr25k-lall.mat'
+    TXT_DIR   = './datasets/MIRFlickr_djsrh/mirflickr25k-yall.mat'
+    IMG_DIR   = './datasets/MIRFlickr_djsrh/mirflickr25k-iall.mat'
     
     BETA = 0.9
     LAMBDA1 = 0.1
     LAMBDA2 = 0.1
-    NUM_EPOCH = 80
+    NUM_EPOCH = 60
     LR_IMG = 0.001
     LR_TXT = 0.01
-    EVAL_INTERVAL = 40
+    EVAL_INTERVAL = 10
 
 if DATASET == 'NUSWIDE':
 
@@ -54,7 +54,7 @@ if DATASET == 'NUSWIDE':
 
 
 BATCH_SIZE = 32
-CODE_LEN = 64
+CODE_LEN = 128
 MU = 1.5
 ETA = 0.4
 
@@ -64,7 +64,7 @@ WEIGHT_DECAY = 5e-4
 
 GPU_ID = 0
 NUM_WORKERS = 8
-EPOCH_INTERVAL = 2
+EPOCH_INTERVAL = 10
 
 MODEL_DIR = './checkpoint'
 

@@ -101,9 +101,10 @@ if settings.DATASET == "WIKI":
 if settings.DATASET == "MIRFlickr":
     
     label_set = scio.loadmat(settings.LABEL_DIR)
-    label_set = np.array(label_set['LAll'], dtype=np.float)
+    label_set = np.array(label_set['LAll'], dtype=float)
     txt_set = scio.loadmat(settings.TXT_DIR)
-    txt_set = np.array(txt_set['YAll'], dtype=np.float)
+    txt_set = np.array(txt_set['YAll'], dtype=float)
+
 
     first = True
     for label in range(label_set.shape[1]):
@@ -175,13 +176,12 @@ if settings.DATASET == "MIRFlickr":
                 self.txt = txt_set[indexTest]
 
         def __getitem__(self, index):
-
-            mirflickr = h5py.File(settings.IMG_DIR, 'r', libver='latest', swmr=True)
+            mirflickr = h5py.File(settings.IMG_DIR, 'r')
             img, target = mirflickr['IAll'][self.train_index[index]], self.train_labels[index]
             img = Image.fromarray(np.transpose(img, (2, 1, 0)))
             mirflickr.close()
-            
             txt = self.txt[index]
+
 
             if self.transform is not None:
                 img = self.transform(img)

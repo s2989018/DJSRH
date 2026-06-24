@@ -121,7 +121,8 @@ class Session:
             if (idx + 1) % (len(self.train_dataset) // settings.BATCH_SIZE / settings.EPOCH_INTERVAL) == 0:
                 self.logger.info('Epoch [%d/%d], Iter [%d/%d] Loss1: %.4f Loss2: %.4f Loss3: %.4f Total Loss: %.4f'
                     % (epoch + 1, settings.NUM_EPOCH, idx + 1, len(self.train_dataset) // settings.BATCH_SIZE,
-                        loss1.data[0], loss2.data[0], loss3.data[0], loss.data[0]))
+                        loss1.item(), loss2.item(), loss3.item(), loss.item()))
+                
 
     def eval(self):
         self.logger.info('--------------------Evaluation: Calculate top MAP-------------------')
