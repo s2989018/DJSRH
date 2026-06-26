@@ -197,36 +197,15 @@ if settings.DATASET == "MIRFlickr":
 if settings.DATASET == "NUSWIDE":
 
     label_set = scio.loadmat(settings.LABEL_DIR)
-    label_set = np.array(label_set['LAll'], dtype=np.float)
+    label_set = np.array(label_set['LAll'], dtype=float)
     txt_file = h5py.File(settings.TXT_DIR)
     txt_set = np.array(txt_file['YAll']).transpose()
     txt_file.close()
 
 
-    first = True
-
-    for label in range(label_set.shape[1]):
-        index = np.where(label_set[:,label] == 1)[0]
-        
-        N = index.shape[0]
-        perm = np.random.permutation(N)
-        index = index[perm]
-        
-        if first:
-            test_index = index[:200]
-            train_index = index[200:700]
-            first = False
-        else:
-            ind = np.array([i for i in list(index) if i not in (list(train_index)+list(test_index))])
-            test_index = np.concatenate((test_index, ind[:200]))
-            train_index = np.concatenate((train_index, ind[200:700]))
-
-        
-    database_index = np.array([i for i in list(range(label_set.shape[0])) if i not in list(test_index)])
-
-    indexTest = test_index
-    indexDatabase = database_index
-    indexTrain = train_index
+    indexTrain = np.load("./datasets/NUSWIDE_djsrh/nuswide_train_index.npy")
+    indexTest = np.load("./datasets/NUSWIDE_djsrh/nuswide_query_index.npy")
+    indexDatabase = np.load("./datasets/NUSWIDE_djsrh/nuswide_database_index.npy")
 
 
     nus_train_transform = transforms.Compose([

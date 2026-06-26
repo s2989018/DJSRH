@@ -7,7 +7,10 @@ import datasets
 import settings
 from models import ImgNet, TxtNet
 import os.path as osp
-
+import time
+import os
+import numpy as np
+import argparse
 
 class Session:
     def __init__(self):
@@ -16,6 +19,8 @@ class Session:
         torch.manual_seed(1)
         torch.cuda.manual_seed_all(1)
         torch.cuda.set_device(settings.GPU_ID)
+
+        hash_start = time.time()
 
         if settings.DATASET == "WIKI":
             self.train_dataset = datasets.WIKI(root=settings.DATA_DIR, train=True, transform=datasets.wiki_train_transform)
@@ -124,21 +129,47 @@ class Session:
                         loss1.item(), loss2.item(), loss3.item(), loss.item()))
                 
 
-    def eval(self):
+    def eval(self,  save_npz=False):
         self.logger.info('--------------------Evaluation: Calculate top MAP-------------------')
 
         # Change model to 'eval' mode (BN uses moving mean/var).
         self.CodeNet_I.eval().cuda()  
         self.CodeNet_T.eval().cuda()
 
+        hash_start = time.time()
+
         if settings.DATASET == "WIKI":
             re_BI, re_BT, re_L, qu_BI, qu_BT, qu_L = compress_wiki(self.database_loader, self.test_loader, self.CodeNet_I, self.CodeNet_T, self.database_dataset, self.test_dataset)
         
         if settings.DATASET == "MIRFlickr" or settings.DATASET == "NUSWIDE":
             re_BI, re_BT, re_L, qu_BI, qu_BT, qu_L = compress(self.database_loader, self.test_loader, self.CodeNet_I, self.CodeNet_T, self.database_dataset, self.test_dataset)
-          
+        
+        hash_gen_time = time.time() - hash_start
+        self.logger.info('Hash code generation time: %.2f seconds' % hash_gen_time)
+
         MAP_I2T = calculate_top_map(qu_B=qu_BI, re_B=re_BT, qu_L=qu_L, re_L=re_L, topk=50)
         MAP_T2I = calculate_top_map(qu_B=qu_BT, re_B=re_BI, qu_L=qu_L, re_L=re_L, topk=50)
+
+        if save_npz:
+            os.makedirs("./results", exist_ok=True)
+
+            np.savez(
+                "./results/%s_%dbits_DJSRH_codes.npz"
+                % (settings.DATASET, settings.CODE_LEN),
+
+                re_BI=re_BI,
+                re_BT=re_BT,
+                re_L=re_L,
+                qu_BI=qu_BI,
+                qu_BT=qu_BT,
+                qu_L=qu_L,
+
+                MAP_I2T=MAP_I2T,
+                MAP_T2I=MAP_T2I,
+                hash_gen_time=hash_gen_time,
+            )
+
+            self.logger.info("Saved codes to ./results")
 
         self.logger.info('MAP of Image to Text: %.3f, MAP of Text to Image: %.3f' % (MAP_I2T, MAP_T2I))
         self.logger.info('--------------------------------------------------------------------')
@@ -175,9 +206,10 @@ def main():
 
     if settings.EVAL == True:
         sess.load_checkpoints()
-        sess.eval()
+        sess.eval(save_npz=True)
 
     else :
+        total_train_start = time.time()
         for epoch in range(settings.NUM_EPOCH):
             # train the Model
             sess.train(epoch)
@@ -187,7 +219,15 @@ def main():
             # save the model
             if epoch + 1 == settings.NUM_EPOCH:
                 sess.save_checkpoints(step=epoch+1)
+        total_train_time = time.time() - total_train_start
+        settings.logger.info("Total training time: %.2f seconds" % total_train_time)
           
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--eval', action='store_true', help='Run test/evaluation only')
+    args = parser.parse_args()
+
+    settings.EVAL = args.eval
+
     main()

@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=djsrh_mir
+#SBATCH --job-name=djsrh_nus
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
 #SBATCH --mail-user="yesminaelarkoubi@gmail.com"
@@ -36,13 +36,13 @@ echo "[$SHELL] ## current working directory: "$CWD
 echo "[$SHELL] Using GPU: "$CUDA_VISIBLE_DEVICES
 nvidia-smi
 
-OUT_DIR="./datasets/MIRFlickr_djsrh"
+OUT_DIR="./datasets/NUSWIDE_djsrh"
 
 if [ -d "$OUT_DIR" ]; then
     echo "[$SHELL] ## Preprocessing already exists. Skipping."
 else
     echo "[$SHELL] ## Running preprocessing..."
-    python preprocessing.py
+    python preprocessing_nus.py
 fi
 
 echo "[$SHELL] ## Starting DJSRH training"

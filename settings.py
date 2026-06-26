@@ -6,7 +6,7 @@ import os.path as osp
 EVAL = False
 
 # dataset can be 'WIKI', 'MIRFlickr' or 'NUSWIDE'
-DATASET = 'MIRFlickr'
+DATASET = 'NUSWIDE'
 
 if DATASET == 'WIKI':
 
@@ -40,9 +40,10 @@ if DATASET == 'MIRFlickr':
 
 if DATASET == 'NUSWIDE':
 
-    LABEL_DIR = 'path/to/NUS-WIDE-TC10/nus-wide-tc10-lall.mat'
-    TXT_DIR = 'path/to/NUS-WIDE-TC10/nus-wide-tc10-yall.mat'
-    IMG_DIR = 'path/to/NUS-WIDE-TC10/IAll/nus-wide-tc10-iall.mat'
+
+    LABEL_DIR = './datasets/NUSWIDE_djsrh/nuswide-lall.mat'
+    TXT_DIR   = './datasets/NUSWIDE_djsrh/nuswide-yall.mat'
+    IMG_DIR   = './datasets/NUSWIDE_djsrh/nuswide-iall.mat'
 
     BETA = 0.6
     LAMBDA1 = 0.1
@@ -50,7 +51,7 @@ if DATASET == 'NUSWIDE':
     NUM_EPOCH = 80
     LR_IMG = 0.001
     LR_TXT = 0.01
-    EVAL_INTERVAL = 40
+    EVAL_INTERVAL = 10
 
 
 BATCH_SIZE = 32
